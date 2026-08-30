@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QRinator — QR Tag Generator</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@600;800&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <div>
+      <div class="brand-row">
+        <svg class="brand-mark" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-label="QRinator logo" role="img">
+          <circle cx="32" cy="32" r="29" fill="var(--paper)" stroke="var(--ink)" stroke-width="3"/>
+          <circle cx="32" cy="32" r="24" fill="none" stroke="var(--ink)" stroke-width="1.1" stroke-dasharray="2.2 3.4" opacity="0.55"/>
+          <rect x="19" y="19" width="26" height="26" rx="4" fill="var(--ink)"/>
+          <rect x="23" y="23" width="18" height="18" rx="3" fill="var(--paper)"/>
+          <rect x="27" y="27" width="10" height="10" rx="2" fill="var(--ink)"/>
+          <circle cx="49" cy="15" r="3.4" fill="var(--rust)"/>
+        </svg>
+        <h1>QRinator</h1>
+      </div>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ORDER SLIP / CONTROLS -->
+    <section class="panel">
+
+      <div class="field">
+        <label for="urlInput">01 — Where should it point?</label>
+        <input type="url" id="urlInput" placeholder="https://example.com" autocomplete="off">
+        <div class="hint">Paste a link, or type anything — text, a message, a Wi-Fi note.</div>
+      </div>
+
+      <div class="field">
+        <label>02 — Pattern</label>
+        <div class="style-row" id="patternRow">
+          <button type="button" class="style-btn active" data-pattern="square">Classic</button>
+          <button type="button" class="style-btn" data-pattern="rounded">Rounded</button>
+          <button type="button" class="style-btn" data-pattern="dots">Dots</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>03 — Corner marks</label>
+        <div class="style-row" id="eyeRow">
+          <button type="button" class="style-btn active" data-eye="square">Square</button>
+          <button type="button" class="style-btn" data-eye="rounded">Rounded</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>04 — Ink &amp; paper</label>
+        <div class="swatch-row">
+          <div class="swatch-field">
+            <input type="color" id="fgColor" value="#212a35">
+            <span>Ink</span>
+          </div>
+          <div class="swatch-field">
+            <input type="color" id="bgColor" value="#fffdf6">
+            <span>Paper</span>
+          </div>
+        </div>
+        <div class="hint">Keep them high-contrast so scanners can read it.</div>
+      </div>
+
+      <div class="field">
+        <label for="logoInput">05 — Center mark (optional)</label>
+        <div class="file-btn">
+          <input type="file" id="logoInput" accept="image/*">
+          <button type="button" class="clear-logo" id="clearLogo">remove</button>
+        </div>
+        <div class="hint">Upload your own image, or drop it straight onto the tag. We'll boost error correction so it still scans.</div>
+
+        <div class="or-divider">— or pick a quick mark —</div>
+        <div class="preset-row" id="presetRow"></div>
+      </div>
+
+      <button type="button" class="download-btn" id="downloadBtn" disabled>Download Tag ↓</button>
+
+      <button type="button" class="download-btn alt" id="downloadSvgBtn" disabled>Download SVG ↓</button>
+
+      <div class="export-panel">
+        <div class="or-divider" style="margin-top:0;">— or export as image —</div>
+        <div class="export-row">
+          <select id="imgFormat" aria-label="Image format">
+            <option value="png">PNG</option>
+            <option value="jpeg">JPEG</option>
+          </select>
+          <label class="quality-label">
+            Quality <span id="qualityValue">92</span>%
+            <input type="range" id="imgQuality" min="10" max="100" value="92">
+          </label>
+        </div>
+        <div class="hint" style="margin-top:0;margin-bottom:10px;">Quality only affects JPEG — PNG stays lossless.</div>
+        <button type="button" class="download-btn alt" id="downloadImgBtn" disabled>Download Image ↓</button>
+      </div>
+
+    </section>
+
+    <!-- LIVE TAG PREVIEW -->
+    <section class="stage">
+      <svg class="string-svg" id="stringSvg" viewBox="0 0 90 46" fill="none">
+        <path d="M2,2 C 30,44 60,44 88,2" stroke="#3a2c18" stroke-width="2" fill="none"/>
+      </svg>
+
+      <div class="tag" id="tagEl">
+        <div class="hole" id="holeEl"></div>
+        <div class="tag-top">
+          <span id="tagLabel">QR TAG</span>
+          <span id="tagDate"></span>
+        </div>
+
+        <div class="qr-frame">
+          <canvas id="qrcanvas" width="440" height="440"></canvas>
+          <div class="placeholder-msg" id="placeholderMsg">Type a link on the left<br>to punch your first tag.</div>
+        </div>
+
+        <div class="tag-bottom">
+          <div class="verify-line">Scan to verify</div>
+          <div class="serial" id="serialNo">SERIAL NO. 000-0000</div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <a class="coffee-btn" href="https://buymeacoffee.com/anmoltitoriya" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 10h13v5a5 5 0 0 1-5 5H9a5 5 0 0 1-5-5v-5z"/>
+        <path d="M17 11h1.5a2.5 2.5 0 0 1 0 5H17"/>
+        <path d="M8 3.5c0 1-1 1-1 2s1 1 1 2"/>
+        <path d="M12 3.5c0 1-1 1-1 2s1 1 1 2"/>
+      </svg>
+      Buy me a coffee
+    </a>
+    <div class="copyright">© 2026 Anmol Titoriya</div>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="script.js"></script>
+
+</body>
+</html>
