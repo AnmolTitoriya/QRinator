@@ -215,12 +215,23 @@ input[type="file"]{
 }
 
 .or-divider{
+  display: flex;
+  align-items: center;
+  gap: 10px;
   font-family:'JetBrains Mono', monospace;
   font-size: 10.5px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--ink-soft);
   margin: 12px 0 8px;
+}
+.or-divider::before,
+.or-divider::after{
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--ink-soft);
+  opacity: 0.35;
 }
 
 .preset-row{
