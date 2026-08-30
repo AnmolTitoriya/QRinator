@@ -29,7 +29,7 @@
   let hasGenerated = false;
   let lastQrData = null;    // cached geometry from the last successful render(), reused by exports
 
-  // Renders real SVG path data onto the QR canvas — scales it to fit an s×s
+  // Renders real SVG path data onto the QR canvas - scales it to fit an s×s
   // box centered at (cx,cy), in the current ink color, regardless of the
   // original viewBox size or origin.
   function drawSvgPath(ctx, cx, cy, s, opts){
@@ -53,10 +53,10 @@
   }
 
   // Expandable icon library for the center mark. Each entry needs:
-  //  id    — unique key, stored in markMode
-  //  label — shown as a tooltip
-  //  icon  — inline SVG markup for the picker button (uses currentColor)
-  //  draw  — how it's stamped onto the actual QR canvas, in the current ink color
+  //  id    - unique key, stored in markMode
+  //  label - shown as a tooltip
+  //  icon  - inline SVG markup for the picker button (uses currentColor)
+  //  draw  - how it's stamped onto the actual QR canvas, in the current ink color
   // To add a new mark later: push one more entry here, nothing else changes.
   const MARK_LIBRARY = [
     {
@@ -508,7 +508,7 @@
     const cell = size / (count + quiet*2);
     const offset = cell * quiet;
 
-    // No full-canvas paper fill here on purpose — the canvas stays
+    // No full-canvas paper fill here on purpose - the canvas stays
     // transparent outside the ink shapes, so PNG exports have no background.
     // The on-screen .qr-frame panel behind the canvas still supplies the
     // paper color visually; small structural fills (eye rings, mark backing)
@@ -549,7 +549,7 @@
       drawEye(offset + c*cell, offset + r*cell, cell, eyeStyle, ink);
     });
 
-    // Optional center mark — one at a time: an uploaded image, or a preset icon
+    // Optional center mark - one at a time: an uploaded image, or a preset icon
     if(markMode === 'upload' && logoImage){
       const logoSize = size * 0.20;
       const lx = (size - logoSize)/2;
@@ -597,8 +597,8 @@
     link.click();
   }
 
-  // Builds a true vector SVG of the current tag — real <rect>/<circle> modules,
-  // not a rasterized copy of the canvas — reusing the geometry cached by render().
+  // Builds a true vector SVG of the current tag - real <rect>/<circle> modules,
+  // not a rasterized copy of the canvas - reusing the geometry cached by render().
   function buildSvgMarkup(){
     const d = lastQrData;
     if(!d) return null;
@@ -637,7 +637,7 @@
       mark += `<clipPath id="markClip"><rect x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" width="${logoSize.toFixed(2)}" height="${logoSize.toFixed(2)}" rx="8"/></clipPath>`;
       mark += `<image href="${logoImageDataUrl}" xlink:href="${logoImageDataUrl}" x="${lx.toFixed(2)}" y="${ly.toFixed(2)}" width="${logoSize.toFixed(2)}" height="${logoSize.toFixed(2)}" clip-path="url(#markClip)" preserveAspectRatio="xMidYMid slice"/>`;
     } else if(markMode && MARK_BY_ID[markMode]){
-      // Rasterize just the small mark (not the whole QR) and embed it —
+      // Rasterize just the small mark (not the whole QR) and embed it -
       // the scannable modules and eyes above stay true vector either way.
       const markSize = size*0.20, pad = markSize*0.30;
       const bx = size/2-markSize/2-pad, by = size/2-markSize/2-pad, bs = markSize+pad*2;
@@ -688,7 +688,7 @@
     const ext = format === 'jpeg' ? 'jpg' : 'png';
 
     if(format === 'jpeg'){
-      // JPEG has no transparency — composite onto a paper-colored backdrop
+      // JPEG has no transparency - composite onto a paper-colored backdrop
       // just for this export so it doesn't turn black. PNG stays transparent.
       const flat = document.createElement('canvas');
       flat.width = canvas.width;

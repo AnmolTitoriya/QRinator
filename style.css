@@ -292,7 +292,7 @@ input[type="file"]{
   box-shadow: 4px 4px 0 var(--ink);
 }
 
-/* Same font, same shape, same shadow — colors swapped: white fill, red text */
+/* Same font, same shape, same shadow - colors swapped: white fill, red text */
 .download-btn.alt{
   background: #ffffff;
   color: var(--rust);

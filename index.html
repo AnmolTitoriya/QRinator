@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QRinator — QR Tag Generator</title>
+<title>QRinator - QR Tag Generator</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -36,13 +36,13 @@
     <section class="panel">
 
       <div class="field">
-        <label for="urlInput">01 — Where should it point?</label>
+        <label for="urlInput">01 - Where should it point?</label>
         <input type="url" id="urlInput" placeholder="https://example.com" autocomplete="off">
-        <div class="hint">Paste a link, or type anything — text, a message, a Wi-Fi note.</div>
+        <div class="hint">Paste a link, or type anything - text, a message, a Wi-Fi note.</div>
       </div>
 
       <div class="field">
-        <label>02 — Pattern</label>
+        <label>02 - Pattern</label>
         <div class="style-row" id="patternRow">
           <button type="button" class="style-btn active" data-pattern="square">Classic</button>
           <button type="button" class="style-btn" data-pattern="rounded">Rounded</button>
@@ -51,7 +51,7 @@
       </div>
 
       <div class="field">
-        <label>03 — Corner marks</label>
+        <label>03 - Corner marks</label>
         <div class="style-row" id="eyeRow">
           <button type="button" class="style-btn active" data-eye="square">Square</button>
           <button type="button" class="style-btn" data-eye="rounded">Rounded</button>
@@ -59,7 +59,7 @@
       </div>
 
       <div class="field">
-        <label>04 — Ink &amp; paper</label>
+        <label>04 - Ink &amp; paper</label>
         <div class="swatch-row">
           <div class="swatch-field">
             <input type="color" id="fgColor" value="#212a35">
@@ -74,14 +74,14 @@
       </div>
 
       <div class="field">
-        <label for="logoInput">05 — Center mark (optional)</label>
+        <label for="logoInput">05 - Center mark (optional)</label>
         <div class="file-btn">
           <input type="file" id="logoInput" accept="image/*">
           <button type="button" class="clear-logo" id="clearLogo">remove</button>
         </div>
         <div class="hint">Upload your own image, or drop it straight onto the tag. We'll boost error correction so it still scans.</div>
 
-        <div class="or-divider">— or pick a quick mark —</div>
+        <div class="or-divider">- or pick a quick mark -</div>
         <div class="preset-row" id="presetRow"></div>
       </div>
 
@@ -90,7 +90,7 @@
       <button type="button" class="download-btn alt" id="downloadSvgBtn" disabled>Download SVG ↓</button>
 
       <div class="export-panel">
-        <div class="or-divider" style="margin-top:0;">— or export as image —</div>
+        <div class="or-divider" style="margin-top:0;">- or export as image -</div>
         <div class="export-row">
           <select id="imgFormat" aria-label="Image format">
             <option value="png">PNG</option>
@@ -101,7 +101,7 @@
             <input type="range" id="imgQuality" min="10" max="100" value="92">
           </label>
         </div>
-        <div class="hint" style="margin-top:0;margin-bottom:10px;">Quality only affects JPEG — PNG stays lossless.</div>
+        <div class="hint" style="margin-top:0;margin-bottom:10px;">Quality only affects JPEG - PNG stays lossless.</div>
         <button type="button" class="download-btn alt" id="downloadImgBtn" disabled>Download Image ↓</button>
       </div>
 
