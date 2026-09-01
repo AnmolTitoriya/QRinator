@@ -427,6 +427,92 @@
     };
   }
 
+  // --- QR encoding: QRGenerator (.NET WASM) with instant local fallback --
+  // QRGenerator (github.com/AnmolTitoriya/QRGenerator) runs entirely client-side
+  // in a hidden same-origin iframe - loaded in the background so it never
+  // delays first paint, and raced against a short timeout so a slow/failed
+  // load always falls back to the local qrcode-generator library instead of
+  // stalling the UI. Only re-encodes when text/EC level actually change;
+  // color/pattern-only re-renders reuse the cached result either way.
+  const QR_WASM_URL = 'https://anmoltitoriya.github.io/QRGenerator/';
+  const QR_WASM_READY_TIMEOUT_MS = 1500;
+  let qrEncodeCache = { key: null, view: null };
+  let qrFramePromise = null;
+
+  function loadQrFrame(){
+    if(qrFramePromise) return qrFramePromise;
+    qrFramePromise = new Promise((resolve, reject) => {
+      const frame = document.createElement('iframe');
+      frame.src = QR_WASM_URL;
+      frame.style.display = 'none';
+      frame.setAttribute('aria-hidden', 'true');
+      frame.title = 'QR encoder';
+      frame.addEventListener('load', () => {
+        // Reading .contentWindow/.QrGenerator across origins (or a same-origin
+        // load that hasn't fully initialized yet) can throw synchronously -
+        // keep this in the promise chain so it always resolves or rejects.
+        try{
+          const win = frame.contentWindow;
+          if(!win || !win.QrGenerator){
+            reject(new Error('QRGenerator not found in frame'));
+            return;
+          }
+          win.QrGenerator.ready.then(() => resolve(win.QrGenerator), reject);
+        }catch(err){
+          reject(err);
+        }
+      });
+      frame.addEventListener('error', () => reject(new Error('QR encoder frame failed to load')));
+      document.body.appendChild(frame);
+    });
+    return qrFramePromise;
+  }
+  // Start loading immediately so it has a head start before it's first needed.
+  loadQrFrame().catch(() => {});
+
+  function localQr(text, ecLevel){
+    let qr;
+    try{
+      qr = qrcode(0, ecLevel);
+      qr.addData(text);
+      qr.make();
+    }catch(err){
+      qr = qrcode(0, 'L');
+      qr.addData(text);
+      qr.make();
+    }
+    return qr; // already exposes getModuleCount()/isDark(r,c)
+  }
+
+  function wasmQrView(result){
+    const { moduleCount, matrix } = result;
+    return {
+      getModuleCount: () => moduleCount,
+      isDark: (r, c) => matrix[r][c] === '1',
+    };
+  }
+
+  function timeout(ms){
+    return new Promise((_, reject) => setTimeout(() => reject(new Error('timed out')), ms));
+  }
+
+  async function getQrView(text, ecLevel){
+    const key = ecLevel + '|' + text;
+    if(qrEncodeCache.key === key) return qrEncodeCache.view;
+
+    let view;
+    try{
+      const generator = await Promise.race([qrFramePromise, timeout(QR_WASM_READY_TIMEOUT_MS)]);
+      const result = await generator.encode(text, ecLevel);
+      view = wasmQrView(result);
+    }catch(err){
+      view = localQr(text, ecLevel);
+    }
+
+    qrEncodeCache = { key, view };
+    return view;
+  }
+
   function roundedRectPath(x,y,w,h,r){
     ctx.beginPath();
     ctx.moveTo(x+r,y);
@@ -464,7 +550,9 @@
     ctx.fill();
   }
 
-  function render(){
+  let renderGeneration = 0;
+
+  async function render(){
     const raw = urlInput.value.trim();
     if(!raw){
       canvas.style.display = 'none';
@@ -483,24 +571,18 @@
       text = 'https://' + text;
     }
 
+    const ecLevel = markMode ? 'H' : 'M';
+    const myGeneration = ++renderGeneration;
+    const qr = await getQrView(text, ecLevel);
+    // A newer render() call started (and may already have redrawn the canvas
+    // or hidden it) while this one was awaiting the QR encode - drop this one.
+    if(myGeneration !== renderGeneration) return;
+
     canvas.style.display = 'block';
     placeholderMsg.style.display = 'none';
     downloadBtn.disabled = false;
     downloadSvgBtn.disabled = false;
     downloadImgBtn.disabled = false;
-
-    const ecLevel = markMode ? 'H' : 'M';
-    let qr;
-    try{
-      qr = qrcode(0, ecLevel);
-      qr.addData(text);
-      qr.make();
-    }catch(err){
-      // Fallback: text too long for this EC level, drop to a lighter level
-      qr = qrcode(0, 'L');
-      qr.addData(text);
-      qr.make();
-    }
 
     const count = qr.getModuleCount();
     const size = canvas.width;
